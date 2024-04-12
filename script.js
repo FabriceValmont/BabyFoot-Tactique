@@ -96,6 +96,7 @@ createField()
 
 let kickOff = "player1"
 const cells = document.querySelectorAll('.cell');
+let selectedCellIndex = 0
 
 let Commitment = () => {
     if (kickOff === "player1"){
@@ -116,10 +117,44 @@ let Commitment = () => {
 
 function selectPlayer(event) {
     const cell = event.target;
-  
     const index = Array.from(cells).indexOf(cell);
-    console.log(index);
+
+    if (selectedCellIndex === null) {
+        // Si aucune cellule n'est sélectionnée, marquez cette cellule comme sélectionnée
+        console.log("Test")
+        selectedCellIndex = index;
+        console.log(selectedCellIndex)
+    } else {
+        // Si une cellule est déjà sélectionnée, vérifiez si c'est la même cellule
+        if (index !== selectedCellIndex) {
+            passBall(index); // Appliquez les changements car c'est le deuxième clic sur la même cellule
+            selectedCellIndex = null; // Réinitialisez la variable de suivi
+        } else {
+            // Sinon, désélectionnez la cellule précédente et sélectionnez la nouvelle cellule
+            selectedCellIndex = index;
+        }
+    }
 }
+
+
+let passBall = (index) => {
+    let cellElement = document.querySelectorAll("div")[7].querySelectorAll("p")[7];
+    let cellElement1 = document.querySelectorAll("div")[5].querySelectorAll("p")[7];
+
+    if(index === 3){
+        ballField[6][7] = "0"
+        cellElement.classList.remove("bg-white");
+        cellElement.classList.add("bg-red-500");
+
+        ballField[4][7] = "B"
+        cellElement1.classList.remove("bg-red-500");
+        cellElement1.classList.add("bg-white");
+
+    }else{
+        console.log("Le joueur ne possède pas la balle")
+    }
+}
+
 
 Commitment()
 
