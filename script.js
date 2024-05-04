@@ -18,6 +18,8 @@ const createField = () => {
             // Création d'une nouvelle cellule (élément <p> pour cet exemple)
             let nouvelleCellule = document.createElement("p");
     
+            nouvelleCellule.dataset.row = i;
+            nouvelleCellule.dataset.col = j;
             // Appliquer des classes Tailwind CSS en fonction de la valeur dans la cellule
             switch (soccerField[i][j]) {
                 case "x":
@@ -96,7 +98,9 @@ createField()
 
 let kickOff = "player1"
 const cells = document.querySelectorAll('.cell');
-let selectedCellIndex = 0
+let rowPlayerSelect = null
+let colPlayerSelect = null
+let cellPlayerSelect = null
 
 let Commitment = () => {
     if (kickOff === "player1"){
@@ -117,42 +121,38 @@ let Commitment = () => {
 
 function selectPlayer(event) {
     const cell = event.target;
-    const index = Array.from(cells).indexOf(cell);
 
-    if (selectedCellIndex === null) {
-        // Si aucune cellule n'est sélectionnée, marquez cette cellule comme sélectionnée
-        console.log("Test")
-        selectedCellIndex = index;
-        console.log(selectedCellIndex)
-    } else {
-        // Si une cellule est déjà sélectionnée, vérifiez si c'est la même cellule
-        if (index !== selectedCellIndex) {
-            passBall(index); // Appliquez les changements car c'est le deuxième clic sur la même cellule
-            selectedCellIndex = null; // Réinitialisez la variable de suivi
-        } else {
-            // Sinon, désélectionnez la cellule précédente et sélectionnez la nouvelle cellule
-            selectedCellIndex = index;
+
+    if (rowPlayerSelect === null && colPlayerSelect === null) {
+        rowPlayerSelect = cell.dataset.row;
+        colPlayerSelect = cell.dataset.col;
+        cellPlayerSelect = cell
+        console.log("Coordonnée du joueur selectionné : ", rowPlayerSelect, colPlayerSelect);
+    } else if (rowPlayerSelect != cell.dataset.row || colPlayerSelect != cell.dataset.col) {
+            let rowPlayerSelectPass = cell.dataset.row;
+            let colPlayerSelectPass = cell.dataset.col;
+            let cellPlayerSelectPass = cell
+            passBall(rowPlayerSelect, colPlayerSelect, rowPlayerSelectPass, colPlayerSelectPass, cellPlayerSelect, cellPlayerSelectPass); 
+            rowPlayerSelect = null;
+            colPlayerSelect = null;
+    } else if (rowPlayerSelect === cell.dataset.row && colPlayerSelect === cell.dataset.col) {
+            console.log("Le joueur selectionnée est le même")
         }
-    }
+    
 }
 
 
-let passBall = (index) => {
-    let cellElement = document.querySelectorAll("div")[7].querySelectorAll("p")[7];
-    let cellElement1 = document.querySelectorAll("div")[5].querySelectorAll("p")[7];
+let passBall = (iPlayerSelect, jPlayerSelect, iPlayerSelectPass, jPlayerSelectPass, cellPlayerSelect, cellPlayerSelectPass) => {
+    
+    ballField[iPlayerSelect][jPlayerSelect] = "0"
+    ballField[iPlayerSelectPass][jPlayerSelectPass] = "B"
 
-    if(index === 3){
-        ballField[6][7] = "0"
-        cellElement.classList.remove("bg-white");
-        cellElement.classList.add("bg-red-500");
+    cellPlayerSelect.classList.remove("bg-white")
+    cellPlayerSelect.classList.add("bg-red-500")
 
-        ballField[4][7] = "B"
-        cellElement1.classList.remove("bg-red-500");
-        cellElement1.classList.add("bg-white");
+    cellPlayerSelectPass.classList.remove("bg-red-500")
+    cellPlayerSelectPass.classList.add("bg-white")
 
-    }else{
-        console.log("Le joueur ne possède pas la balle")
-    }
 }
 
 
