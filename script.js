@@ -26,7 +26,7 @@ const createField = () => {
                     nouvelleCellule.classList.add("bg-black", "w-10", "h-10", "p-2", "border-2", "border-black"); // Définir la couleur pour les zones de terrain
                     break;
                 case "c":
-                    nouvelleCellule.classList.add("bg-white", "w-10", "h-10", "p-2", "border-2", "border-black"); // Définir la couleur pour les coins et rendre les coins ronds
+                    nouvelleCellule.classList.add("cell", "bg-white", "w-10", "h-10", "p-2", "border-2", "border-black"); // Définir la couleur pour les coins et rendre les coins ronds
                     break;
                 case "g":
                     nouvelleCellule.classList.add("bg-green-500", "w-10", "h-10", "p-2", "border-2", "border-black"); // Définir la couleur pour les zones vides
@@ -35,7 +35,7 @@ const createField = () => {
                 case "DR":
                 case "MR":
                 case "SR":
-                    nouvelleCellule.classList.add("cell","bg-red-500", "w-10", "h-10", "p-2", "border-2", "border-black"); // Définir la couleur pour les joueurs, rendre les joueurs ronds et centrer le texte
+                    nouvelleCellule.classList.add("cell", "bg-red-500", "w-10", "h-10", "p-2", "border-2", "border-black"); // Définir la couleur pour les joueurs, rendre les joueurs ronds et centrer le texte
                     nouvelleCellule.innerText = soccerField[i][j]; // Afficher l'abréviation du joueur
                     break;
                 case "MB":
@@ -122,22 +122,29 @@ let Commitment = () => {
 function selectPlayer(event) {
     const cell = event.target;
 
-
     if (rowPlayerSelect === null && colPlayerSelect === null) {
         rowPlayerSelect = cell.dataset.row;
         colPlayerSelect = cell.dataset.col;
         cellPlayerSelect = cell
         console.log("Coordonnée du joueur selectionné : ", rowPlayerSelect, colPlayerSelect);
-    } else if (rowPlayerSelect != cell.dataset.row || colPlayerSelect != cell.dataset.col) {
+        } else if (rowPlayerSelect !== cellPlayerSelect && cell.dataset.col === "16") {
+            let rowPlayerSelectShoot = cell.dataset.row;
+            let colPlayerSelectShoot = cell.dataset.col;
+            shootBall(rowPlayerSelect, colPlayerSelect, rowPlayerSelectShoot, colPlayerSelectShoot, cellPlayerSelect)
+            Commitment()
+        } else if (rowPlayerSelect != cellPlayerSelect || colPlayerSelect != cellPlayerSelect) {
             let rowPlayerSelectPass = cell.dataset.row;
             let colPlayerSelectPass = cell.dataset.col;
             let cellPlayerSelectPass = cell
             passBall(rowPlayerSelect, colPlayerSelect, rowPlayerSelectPass, colPlayerSelectPass, cellPlayerSelect, cellPlayerSelectPass); 
             rowPlayerSelect = null;
             colPlayerSelect = null;
-    } else if (rowPlayerSelect === cell.dataset.row && colPlayerSelect === cell.dataset.col) {
+        } else if (rowPlayerSelect === cell.dataset.row && colPlayerSelect === cell.dataset.col) {
+            rowPlayerSelect = null;
+            colPlayerSelect = null;
             console.log("Le joueur selectionnée est le même")
-        }
+        } 
+    
     
 }
 
@@ -153,6 +160,17 @@ let passBall = (iPlayerSelect, jPlayerSelect, iPlayerSelectPass, jPlayerSelectPa
     cellPlayerSelectPass.classList.remove("bg-red-500")
     cellPlayerSelectPass.classList.add("bg-white")
 
+}
+
+let shootBall = (iPlayerSelect, jPlayerSelect, iPlayerSelectShoot, jPlayerSelectShoot, cellPlayerSelect) => {
+
+    ballField[iPlayerSelect][jPlayerSelect] = "0"
+    ballField[iPlayerSelectShoot][jPlayerSelectShoot] = "B"
+
+    cellPlayerSelect.classList.remove("bg-white")
+    cellPlayerSelect.classList.add("bg-red-500")
+
+    console.log("But !")
 }
 
 
