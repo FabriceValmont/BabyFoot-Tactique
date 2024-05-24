@@ -123,30 +123,32 @@ function selectPlayer(event) {
     const cell = event.target;
 
     if (rowPlayerSelect === null && colPlayerSelect === null) {
-        rowPlayerSelect = cell.dataset.row;
-        colPlayerSelect = cell.dataset.col;
-        cellPlayerSelect = cell
+        rowPlayerSelect = parseInt(cell.dataset.row);
+        colPlayerSelect = parseInt(cell.dataset.col);
+        cellPlayerSelect = cell;
         console.log("Coordonnée du joueur selectionné : ", rowPlayerSelect, colPlayerSelect);
-        } else if (rowPlayerSelect !== cellPlayerSelect && cell.dataset.col === "16") {
-            let rowPlayerSelectShoot = cell.dataset.row;
-            let colPlayerSelectShoot = cell.dataset.col;
-            shootBall(rowPlayerSelect, colPlayerSelect, rowPlayerSelectShoot, colPlayerSelectShoot, cellPlayerSelect)
-            Commitment()
-        } else if (rowPlayerSelect != cellPlayerSelect || colPlayerSelect != cellPlayerSelect) {
-            let rowPlayerSelectPass = cell.dataset.row;
-            let colPlayerSelectPass = cell.dataset.col;
-            let cellPlayerSelectPass = cell
-            passBall(rowPlayerSelect, colPlayerSelect, rowPlayerSelectPass, colPlayerSelectPass, cellPlayerSelect, cellPlayerSelectPass); 
-            rowPlayerSelect = null;
-            colPlayerSelect = null;
-        } else if (rowPlayerSelect === cell.dataset.row && colPlayerSelect === cell.dataset.col) {
-            rowPlayerSelect = null;
-            colPlayerSelect = null;
-            console.log("Le joueur selectionnée est le même")
-        } 
-    
-    
+    } else if (parseInt(cell.dataset.col) === colPlayerSelect) {
+        console.log("Rentré", colPlayerSelect);
+        lineMoveDown(rowPlayerSelect, colPlayerSelect, cellPlayerSelect);
+    } else if (rowPlayerSelect !== cellPlayerSelect && parseInt(cell.dataset.col) === 16) {
+        let rowPlayerSelectShoot = parseInt(cell.dataset.row);
+        let colPlayerSelectShoot = parseInt(cell.dataset.col);
+        shootBall(rowPlayerSelect, colPlayerSelect, rowPlayerSelectShoot, colPlayerSelectShoot, cellPlayerSelect);
+        Commitment();
+    } else if (rowPlayerSelect !== cellPlayerSelect || colPlayerSelect !== cellPlayerSelect) {
+        let rowPlayerSelectPass = parseInt(cell.dataset.row);
+        let colPlayerSelectPass = parseInt(cell.dataset.col);
+        let cellPlayerSelectPass = cell;
+        passBall(rowPlayerSelect, colPlayerSelect, rowPlayerSelectPass, colPlayerSelectPass, cellPlayerSelect, cellPlayerSelectPass);
+        rowPlayerSelect = null;
+        colPlayerSelect = null;
+    } else if (rowPlayerSelect === parseInt(cell.dataset.row) && colPlayerSelect === parseInt(cell.dataset.col)) {
+        rowPlayerSelect = null;
+        colPlayerSelect = null;
+        console.log("Le joueur selectionné est le même");
+    }
 }
+
 
 
 let passBall = (iPlayerSelect, jPlayerSelect, iPlayerSelectPass, jPlayerSelectPass, cellPlayerSelect, cellPlayerSelectPass) => {
@@ -172,6 +174,56 @@ let shootBall = (iPlayerSelect, jPlayerSelect, iPlayerSelectShoot, jPlayerSelect
 
     console.log("But !")
 }
+
+let lineMoveDown = (iPlayerSelect, jPlayerColumn, cellPlayerSelect) => {
+    // Parcourir de bas en haut pour éviter d'écraser les joueurs déjà déplacés
+    for (let i = soccerField.length - 2; i >= 0; i--) {
+        if (soccerField[i][jPlayerColumn] !== "g" && soccerField[i][jPlayerColumn] !== "x") {
+            // Vérifier que la nouvelle position est valide
+            if (i + 1 < soccerField.length && soccerField[i + 1][jPlayerColumn] === "g") {
+                // Mettre à jour la position du joueur
+                let playerType = soccerField[i][jPlayerColumn];
+                soccerField[i][jPlayerColumn] = "g"; // Ancienne position devient vide
+                soccerField[i + 1][jPlayerColumn] = playerType; // Nouvelle position pour le joueur
+
+                // Mettre à jour la couleur de la cellule correspondante dans le document HTML
+                let cellToUpdate = document.querySelector(`[data-row="${i}"][data-col="${jPlayerColumn}"]`);
+                if (cellToUpdate) {
+                    cellToUpdate.classList.remove("bg-red-500", "bg-blue-500");
+                    cellToUpdate.classList.add("bg-green-500");
+                    cellToUpdate.innerText = ""
+                }
+                let cellToUpdateBelow = document.querySelector(`[data-row="${i + 1}"][data-col="${jPlayerColumn}"]`);
+                if (cellToUpdateBelow) {
+                    cellToUpdateBelow.classList.remove("bg-green-500");
+                    cellToUpdateBelow.classList.add("bg-red-500");
+                    cellToUpdateBelow.innerText = playerType;
+                }
+            }
+        }
+    }
+
+    // Gérer le déplacement du joueur sélectionné
+    if (iPlayerSelect + 1 < soccerField.length && soccerField[iPlayerSelect + 1][jPlayerColumn] === "g") {
+        soccerField[iPlayerSelect][jPlayerColumn] = "g";
+        soccerField[iPlayerSelect + 1][jPlayerColumn] = cellPlayerSelect.innerText;
+
+        cellPlayerSelect.classList.remove("bg-red-500", "bg-blue-500");
+        cellPlayerSelect.classList.add("bg-green-500");
+
+        let cellToUpdate = document.querySelector(`[data-row="${iPlayerSelect + 1}"][data-col="${jPlayerColumn}"]`);
+        if (cellToUpdate) {
+            cellToUpdate.classList.remove("bg-green-500");
+            cellToUpdate.classList.add(cellPlayerSelect.innerText.startsWith("M") ? "bg-red-500" : "bg-blue-500");
+            cellToUpdate.innerText = cellPlayerSelect.innerText;
+        }
+    }
+};
+
+
+
+
+
 
 
 Commitment()
